@@ -1,0 +1,18 @@
+{
+  "name": "gridjs",
+  "version": "0.1.0",
+  "description": "GridFS that is easy to use and mongojs compliant",
+  "keywords": [
+    "gridfs",
+    "grid",
+    "gridstore",
+    "fs",
+    "mongo"
+  ],
+  "repository": "git://github.com/mafintosh/gridjs.git",
+  "dependencies": {
+    "thunky": "~0.1.0",
+    "readable-stream": "~1.1.8",
+    "mongodb": "~1.3.19"
+  }
+}
