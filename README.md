@@ -1,6 +1,6 @@
 # gridjs
 
-A GridFS module that is easy to use and [mongojs](https://github.com/mafintosh/mongjs) compliant.
+A GridFS module that is easy to use and [mongojs](https://github.com/mafintosh/mongojs) compliant.
 It is available through npm
 
 	npm install gridjs
