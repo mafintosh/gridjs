@@ -123,11 +123,11 @@ var GridJS = function(obj) {
 		if (typeof obj === 'string') return connect(obj, callback);
 		if (typeof obj !== 'object' || !obj) return callback(new Error('invalid database config'));
 
-		// mongojs.open
-		if (typeof obj.open === 'function') return obj.open(callback);
-
 		// mongojs._get (backwards compat)
 		if (typeof obj._get === 'function') return obj._get(callback);
+		
+		// mongojs.open
+		if (typeof obj.open === 'function') return obj.open(callback);
 
 		// mongodb native stuff
 		if (findGridPrototype(obj)) return callback(null, obj);
@@ -148,28 +148,28 @@ GridJS.prototype.createReadStream = function(filename, opts) {
 
 	var self = this;
 	var ongridstore = thunky(function(callback) {
-		self._open(filename, 'r', callback);
+		self._open(filename, 'r', opts,callback);
 	});
 
 	return new GridStream(ongridstore, filename, opts);
 };
 
-GridJS.prototype.createWriteStream = function(filename, opts) {
+GridJS.prototype.createWriteStream = function(filenameOrId, opts) {
 	if (!opts) opts = {};
 
 	var self = this;
 	var ongridstore = thunky(function(callback) {
-		self._open(filename, opts.flags || 'w', callback);
+		self._open(filenameOrId, opts.flags || 'w', opts, callback);
 	});
 
-	return new GridStream(ongridstore, filename, opts);
+	return new GridStream(ongridstore, filenameOrId, opts);
 };
 
 GridJS.prototype.write = function(filename, buffer, enc, callback) {
 	if (typeof enc === 'function') return this.write(filename, buffer, null, enc);
 	if (!callback) callback = noop;
 	if (!Buffer.isBuffer(buffer)) buffer = new Buffer(buffer, enc || 'utf-8');
-	this._open(filename, 'w', function(err, gs) {
+	this._open(filename, 'w', opts,function(err, gs) {
 		if (err) return callback(err);
 		gs.write(buffer, function(err) {
 			gs.close(function(errClose) {
@@ -181,7 +181,7 @@ GridJS.prototype.write = function(filename, buffer, enc, callback) {
 
 GridJS.prototype.read = function(filename, enc, callback) {
 	if (typeof enc === 'function') return this.read(filename, null, enc);
-	this._open(filename, 'r', function(err, gs) {
+	this._open(filename, 'r', opts, function(err, gs) {
 		if (err) return callback(err);
 		gs.read(function(err, buffer) {
 			gs.close(function(errClose) {
@@ -200,12 +200,12 @@ GridJS.prototype.exists = function(filename, callback) {
 	});
 };
 
-GridJS.prototype.unlink = function(filename, callback) {
+GridJS.prototype.unlink = function(filenameOrId, options, callback) {
 	var self = this;
 	if (!callback) callback = noop;
 	this._init(function(err, db) {
 		if (err) return callback(err);
-		self._proto.unlink(db, filename, callback);
+		self._proto.unlink(db, filenameOrId, options,callback);
 	});
 };
 
@@ -223,11 +223,11 @@ GridJS.prototype.close = function(callback) {
 	});
 };
 
-GridJS.prototype._open = function(filename, mode, callback) {
+GridJS.prototype._open = function(filename, mode, opts, callback) {
 	var self = this;
 	this._init(function(err, db) {
 		if (err) return callback(err);
-		new (self._proto)(db, filename, mode === 'r+' ? 'w+' : mode).open(callback);
+		new (self._proto)(db, filename, mode === 'r+' ? 'w+' : mode, opts).open(callback);
 	});
 };
 

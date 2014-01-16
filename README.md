@@ -33,7 +33,7 @@ mongodb.Db.connect(connectionString, function(err, db) {
 
 ### Writing files
 
-Writing files using gridjs is a simple as piping to `gs.createWriteStream(filename)`
+Writing files using gridjs is a simple as piping to `gs.createWriteStream(filenameOrId)`
 which returns a [streams2 WriteStream](http://nodejs.org/api/stream.html#stream_class_stream_writable)
 
 ``` js
@@ -46,6 +46,24 @@ Alternatively if you have the entire file as a single buffer you can use `gs.wri
 gs.write('test-file', new Buffer('hello world'), function(err) {
 	console.log('file is written', err);
 });
+```
+
+### Writing files with specified Id and metadata
+
+Also you can specify fileId instead of filename, and any GridStore options(http://mongodb.github.io/node-mongodb-native/api-generated/gridstore.html).
+
+``` js
+var newFileId=new ObjectID();
+var writableStream=gs.createWriteStream(newFileId,{
+  metadata:{custom:'data'}
+});
+writableStream.on('close',function(){
+  console.log('gridFiles file(%s) closed',fId.toString());
+});
+writableStream.on('error',function(err){
+  console.log("gridFiles error",err);
+});
+fs.createReadStream('any-file').pipe(writableStream);
 ```
 
 ### Reading files
