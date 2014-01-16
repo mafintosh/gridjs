@@ -200,12 +200,12 @@ GridJS.prototype.exists = function(filename, callback) {
 	});
 };
 
-GridJS.prototype.unlink = function(filename, callback) {
+GridJS.prototype.unlink = function(filenameOrId, options, callback) {
 	var self = this;
 	if (!callback) callback = noop;
 	this._init(function(err, db) {
 		if (err) return callback(err);
-		self._proto.unlink(db, filename, callback);
+		self._proto.unlink(db, filenameOrId, options,callback);
 	});
 };
 
